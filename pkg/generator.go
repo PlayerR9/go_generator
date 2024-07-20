@@ -1,4 +1,4 @@
-package go_generator
+package pkg
 
 import (
 	"bytes"
