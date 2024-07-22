@@ -8,6 +8,8 @@ import (
 )
 
 func main() {
+	pkg.DebugMode = true
+
 	t, err := pkg.NewTemplate(templ)
 	if err != nil {
 		fmt.Println(err)
@@ -15,13 +17,11 @@ func main() {
 	}
 
 	type MyStruct struct {
-		A string
-		B string
+		TypeName string
 	}
 
 	data := MyStruct{
-		A: "foo",
-		B: "bar",
+		TypeName: "Lexer",
 	}
 
 	err = t.Apply(data)
@@ -41,4 +41,4 @@ func main() {
 	fmt.Println(buff.String())
 }
 
-const templ string = "{{ .A }} {{ .B }} my_type"
+const templ string = `{{  .A }} my_type {{ .B }}`

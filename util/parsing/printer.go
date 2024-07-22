@@ -5,7 +5,7 @@ import (
 	uttr "github.com/PlayerR9/go_generator/util/tree"
 )
 
-func PrintTokenTree[T uc.Enumer](root *Token[T]) string {
+func PrintTokenTree[T TokenTyper](root *Token[T]) string {
 	if root == nil {
 		return ""
 	}

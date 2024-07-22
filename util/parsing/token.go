@@ -9,7 +9,19 @@ import (
 	uttr "github.com/PlayerR9/go_generator/util/tree"
 )
 
-type Token[T uc.Enumer] struct {
+type TokenTyper interface {
+	~int
+
+	// IsAcceptSymbol returns true if the token is an accept symbol.
+	//
+	// Returns:
+	//   - bool: True if the token is an accept symbol. False otherwise.
+	IsAcceptSymbol() bool
+
+	fmt.Stringer
+}
+
+type Token[T TokenTyper] struct {
 	Type      T
 	Data      any // either string or []*Token[T]
 	Lookahead *Token[T]
@@ -74,7 +86,7 @@ func (t *Token[T]) String() string {
 }
 
 // nil if either the data is nil or it is not a string nor a []*Token[T]
-func NewToken[T uc.Enumer](typ T, data any, la *Token[T]) *Token[T] {
+func NewToken[T TokenTyper](typ T, data any, la *Token[T]) *Token[T] {
 	if data == nil {
 		return nil
 	}

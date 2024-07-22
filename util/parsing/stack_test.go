@@ -11,6 +11,10 @@ const (
 	Elem TestTokenType = iota
 )
 
+func (t TestTokenType) IsAcceptSymbol() bool {
+	return false
+}
+
 func (t TestTokenType) String() string {
 	return [...]string{
 		"Elem",

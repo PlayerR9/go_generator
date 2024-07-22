@@ -2,16 +2,14 @@ package parsing
 
 import (
 	"slices"
-
-	uc "github.com/PlayerR9/MyGoLib/Units/common"
 )
 
-type Stack[T uc.Enumer] struct {
+type Stack[T TokenTyper] struct {
 	elems  []*Token[T]
 	popped []*Token[T]
 }
 
-func NewStack[T uc.Enumer]() *Stack[T] {
+func NewStack[T TokenTyper]() *Stack[T] {
 	return &Stack[T]{
 		elems:  make([]*Token[T], 0),
 		popped: make([]*Token[T], 0),

@@ -9,16 +9,51 @@ import (
 
 	uc "github.com/PlayerR9/MyGoLib/Units/common"
 	prx "github.com/PlayerR9/go_generator/pkg/parsing"
+	utpx "github.com/PlayerR9/go_generator/util/parsing"
 )
 
+var (
+	// DebugMode is the debug mode. Default is false.
+	DebugMode bool
+)
+
+func init() {
+	DebugMode = false
+}
+
+// Template is a template.
 type Template struct {
+	// root is the root node of the AST.
 	root *Node
 }
 
+// NewTemplate creates a new template.
+//
+// Parameters:
+//   - str: The template string.
+//
+// Returns:
+//   - *Template: The template. Nil if an error occurs.
+//   - error: An error if the template is invalid.
 func NewTemplate(str string) (*Template, error) {
+	if DebugMode {
+		prx.DebugMode = true
+	}
+
 	tokens, err := prx.Lex(str)
 	if err != nil {
 		return nil, fmt.Errorf("invalid template: %w", err)
+	}
+
+	if DebugMode {
+		// DEBUG: Print the tokens
+		fmt.Println("Tokens:")
+
+		for _, token := range tokens {
+			fmt.Println(token.GoString())
+		}
+
+		fmt.Println()
 	}
 
 	root, err := prx.Parse(tokens)
@@ -26,20 +61,24 @@ func NewTemplate(str string) (*Template, error) {
 		return nil, fmt.Errorf("invalid template: %w", err)
 	}
 
-	// DEBUG: Print the parsed tree
-	// fmt.Println("Tree:")
-	// fmt.Println(utpx.PrintTokenTree(root))
-	// fmt.Println()
+	if DebugMode {
+		// DEBUG: Print the parsed tree
+		fmt.Println("Tree:")
+		fmt.Println(utpx.PrintTokenTree(root))
+		fmt.Println()
+	}
 
 	node, err := ToAST(root)
 	if err != nil {
 		return nil, fmt.Errorf("invalid template: %w", err)
 	}
 
-	// DEBUG: Print the AST
-	// fmt.Println("AST:")
-	// fmt.Println(PrintAST(node))
-	// fmt.Println()
+	if DebugMode {
+		// DEBUG: Print the AST
+		fmt.Println("AST:")
+		fmt.Println(PrintAST(node))
+		fmt.Println()
+	}
 
 	return &Template{
 		root: node,
@@ -53,7 +92,7 @@ func (t *Template) Apply(data any) error {
 
 	value := reflect.ValueOf(data)
 
-	for !value.IsZero() {
+	for !value.IsValid() {
 		kind := value.Kind()
 
 		if kind != reflect.Interface && kind != reflect.Pointer {
@@ -63,7 +102,7 @@ func (t *Template) Apply(data any) error {
 		value = value.Elem()
 	}
 
-	if value.IsZero() {
+	if !value.IsValid() {
 		return fmt.Errorf("invalid data type: %s", value.Type().String())
 	}
 
@@ -84,12 +123,12 @@ func (t *Template) Apply(data any) error {
 
 func (t *Template) traverse(node *Node, value reflect.Value) error {
 	uc.AssertParam("node", node != nil, errors.New("node is nil"))
-	uc.AssertParam("value", !value.IsZero(), errors.New("value is zero"))
+	uc.AssertParam("value", value.IsValid(), errors.New("value is zero"))
 
 	switch node.Kind {
 	case VariableNode:
 		field := value.FieldByName(node.Data)
-		if !field.IsZero() {
+		if field.IsValid() {
 			node.Kind = TextNode
 			node.Data = field.String()
 		}
