@@ -7,7 +7,9 @@ import (
 	"strings"
 
 	uc "github.com/PlayerR9/MyGoLib/Units/common"
+	us "github.com/PlayerR9/MyGoLib/Units/slice"
 	utmp "github.com/PlayerR9/go_generator/util/maps"
+	utr "github.com/PlayerR9/go_generator/util/rank"
 )
 
 // DecisionTable is a decision table.
@@ -194,6 +196,8 @@ func NewDecisionTable[T TokenTyper](grammar string, f StringToTypeFunc[T]) (*Dec
 	dt.make_symbols()
 	dt.make_items()
 
+	dt.solve_conflicts()
+
 	if DebugMode {
 		// DEBUG: Print the decision table
 		fmt.Println("Decision Table:")
@@ -239,67 +243,83 @@ func (dt *DecisionTable[T]) Decide(stack *Stack[T], la *T) (Actioner[T], error) 
 	if len(items) == 1 {
 		item := items[0]
 
-		err := item.MatchLookahead(la)
-		if err != nil {
-			return nil, fmt.Errorf("at rule (%q): %w", item.GetLhs().String(), err)
-		}
+		/*
+			err := item.MatchLookahead(la)
+			if err != nil {
+				return nil, fmt.Errorf("at rule (%q): %w", item.GetLhs().String(), err)
+			}
+		*/
 
 		return item.action, nil
 	}
 
-	var matched_items []*Item[T]
+	ranking := utr.NewRank[*Item[T]]()
 
 	for _, k := range items {
-		err := k.MatchLookahead(la)
-		if err == nil {
-			matched_items = append(matched_items, k)
+		ok, err := k.MatchLookahead(la)
+		if err != nil {
+			ranking.AddErr(err, 0)
+		} else if ok {
+			ranking.AddSol(k, 1)
+		} else {
+			ranking.AddSol(k, 0)
 		}
 	}
 
-	if DebugMode {
-		fmt.Println("matched_items:")
+	// if DebugMode {
+	// 	fmt.Println("matched_items:")
+	//
+	// 	for _, item := range matched_items {
+	// 		fmt.Println(item.String())
+	// 	}
+	// 	fmt.Println()
+	// }
 
-		for _, item := range matched_items {
-			fmt.Println(item.String())
+	for delta := 1; ; delta++ {
+		filter_incomplete := func(item *Item[T]) bool {
+			if !item.IsDone(delta) {
+				return true
+			}
+
+			err_sol.AddSol(item, delta)
+
+			return false
 		}
-		fmt.Println()
-	}
 
-	var err_sol uc.ErrOrSol[*Item[T]]
+		matched_items = us.SliceFilter(matched_items, filter_incomplete)
+		if len(matched_items) == 0 {
+			break
+		}
 
-	for delta := 0; len(matched_items) > 0; delta++ {
-		var top_idx int
+		top, has_top := stack.Pop()
 
-		for i := 0; i < len(matched_items); i++ {
-			item := matched_items[i]
+		if !has_top {
+			for _, item := range matched_items {
+				rhs, ok := item.GetRhsRelative(delta)
+				uc.AssertOk(ok, "k.GetRhsRelative(%d) failed", delta)
 
+				err := fmt.Errorf("expected %q, got nothing instead", rhs.String())
+				err_sol.AddErr(err, delta)
+			}
+
+			break
+		}
+
+		filter_same_rhs := func(item *Item[T]) bool {
 			rhs, ok := item.GetRhsRelative(delta)
 			uc.AssertOk(ok, "k.GetRhsRelative(%d) failed", delta)
 
-			top, ok := stack.Pop()
-			if !ok {
-				err := fmt.Errorf("expected %q, got nothing instead", rhs.String())
-				err_sol.AddErr(err, delta)
-
-				continue
+			if top.Type == rhs {
+				return true
 			}
 
-			if top.Type != rhs {
-				err := fmt.Errorf("expected %q, got %q instead", rhs.String(), top.Type.String())
-				err_sol.AddErr(err, delta)
+			err := fmt.Errorf("expected %q, got %q instead", rhs.String(), top.Type.String())
+			err_sol.AddErr(err, delta)
 
-				continue
-			}
-
-			if item.IsDone(delta) {
-				err_sol.AddSol(item, delta)
-
-				matched_items[i] = item
-				top_idx++
-			}
+			return false
 		}
 
-		matched_items = matched_items[:top_idx]
+		matched_items = us.SliceFilter(matched_items, filter_same_rhs)
 	}
 
 	if err_sol.HasError() {
@@ -324,44 +344,9 @@ func (dt *DecisionTable[T]) Decide(stack *Stack[T], la *T) (Actioner[T], error) 
 	}
 
 	// FIXME: Return the most likely solution. However,
-	// as of now, we return the ambiguous grammar error.
+	// as of now, we return the ambiguous grammar error unless it is a shift action.
 
 	return nil, errors.New("ambiguous grammar")
-
-	/*
-		var act Actioner[T]
-
-		switch top1.Type {
-		case TkElem:
-			if la == nil {
-				// [ Elem ] -> Source1 : reduce .
-				rule := []T{TkElem}
-
-				act = NewActReduce(TkSource1, rule)
-			} else {
-				switch la.Type {
-				case TkOpCurly, TkText, TkWs:
-					// Source1 [ Elem ] -> Source1 : shift .
-					// -- op_curly
-					// -- text
-					// -- ws
-					act = NewActShift[T]()
-				default:
-					// [ Elem ] -> Source1 : reduce .
-					rule := []T{TkElem}
-
-					err := p.check_rule(rule)
-					if err != nil {
-						return nil, err
-					}
-
-					act = NewActReduce(TkSource1, []T{TkElem})
-				}
-			}
-		default:
-			return nil, fmt.Errorf("unexpected token %s", top1.Type)
-		}
-	*/
 }
 
 // GetItemsByLhs returns all the items whose LHS is 'lhs'.
@@ -386,6 +371,7 @@ func (dt *DecisionTable[T]) GetItemsByLhs(lhs T) []*Item[T] {
 }
 
 func (dt *DecisionTable[T]) solve_conflicts() {
+	// 1. Determine the lookaheads of each item.
 	target_items := make(map[*Item[T]]T)
 
 	for _, items := range dt.table {
@@ -395,16 +381,49 @@ func (dt *DecisionTable[T]) solve_conflicts() {
 
 		for _, item := range items {
 			prev, ok := item.GetRhsRelative(-1)
-			if ok && !prev.IsTerminal() {
+			if !ok {
+				continue
+			}
+
+			if prev.IsTerminal() {
+				item.lookaheads = []T{prev}
+			} else {
 				target_items[item] = prev
 			}
 		}
 	}
 
+	if len(target_items) == 0 {
+		return
+	}
+
 	for item, prev := range target_items {
 		seen := utmp.NewSeenMap[*Item[T]]()
 
-		la := dt.solve_lookaheads(seen, prev)
+		las := dt.solve_lookaheads(seen, prev)
+
+		item.lookaheads = las
+	}
+
+	// 2. If a symbol has only shift actions, remove all items but one.
+	for symbol, items := range dt.table {
+		if len(items) == 1 {
+			continue
+		}
+
+		only_shift := true
+
+		for _, item := range items {
+			_, ok := item.action.(*ActShift[T])
+			if !ok {
+				only_shift = false
+				break
+			}
+		}
+
+		if only_shift {
+			dt.table[symbol] = []*Item[T]{items[0]}
+		}
 	}
 }
 

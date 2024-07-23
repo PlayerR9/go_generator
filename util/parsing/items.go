@@ -2,6 +2,7 @@ package parsing
 
 import (
 	"fmt"
+	"slices"
 	"strings"
 
 	uc "github.com/PlayerR9/MyGoLib/Units/common"
@@ -151,6 +152,9 @@ type Item[T TokenTyper] struct {
 
 	// pos is the position in the rule.
 	pos int
+
+	// lookaheads are the lookaheads.
+	lookaheads []T
 }
 
 // String implements the fmt.Stringer interface.
@@ -243,24 +247,31 @@ func NewItem[T TokenTyper](rule *Rule[T], pos int, act Actioner[T]) (*Item[T], e
 //   - la: The lookahead.
 //
 // Returns:
+//   - bool: True if the lookahead matches. False otherwise.
 //   - error: An error if the lookahead does not match the rule.
 //
 // As a special case, if item does not need lookahead, nil is returned regardless of the lookahead.
-func (item *Item[T]) MatchLookahead(la *T) error {
-	if item.pos == 0 {
-		return nil
+func (item *Item[T]) MatchLookahead(la *T) (bool, error) {
+	if len(item.lookaheads) == 0 {
+		return false, nil
 	}
-
-	prev, ok := item.rule.GetRhsAt(item.pos - 1)
-	uc.AssertOk(ok, "item.rule.GetRhsAt(%d)", item.pos-1)
 
 	if la == nil {
-		return fmt.Errorf("expected %q, got nothing instead", prev.String())
-	} else if *la != prev {
-		return fmt.Errorf("expected %q, got %q instead", prev.String(), *la)
+		return false, fmt.Errorf("expected %q, got nothing instead", item.lookaheads[0].String())
 	}
 
-	return nil
+	_, ok := slices.BinarySearch(item.lookaheads, *la)
+	if ok {
+		return true, nil
+	}
+
+	values := make([]string, 0, len(item.lookaheads))
+
+	for _, lookahead := range item.lookaheads {
+		values = append(values, lookahead.String())
+	}
+
+	return false, fmt.Errorf("expected %s, got %q instead", uc.OrQuoteString(values, false), *la)
 }
 
 // GetLhs returns the left hand side.
