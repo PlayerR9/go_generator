@@ -8,8 +8,6 @@ import (
 )
 
 func main() {
-	pkg.DebugMode = true
-
 	t, err := pkg.NewTemplate(templ)
 	if err != nil {
 		fmt.Println(err)

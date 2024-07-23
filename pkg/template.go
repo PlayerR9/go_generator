@@ -12,15 +12,6 @@ import (
 	utpx "github.com/PlayerR9/go_generator/util/parsing"
 )
 
-var (
-	// DebugMode is the debug mode. Default is false.
-	DebugMode bool
-)
-
-func init() {
-	DebugMode = false
-}
-
 // Template is a template.
 type Template struct {
 	// root is the root node of the AST.
@@ -36,10 +27,6 @@ type Template struct {
 //   - *Template: The template. Nil if an error occurs.
 //   - error: An error if the template is invalid.
 func NewTemplate(str string) (*Template, error) {
-	if DebugMode {
-		prx.DebugMode = true
-	}
-
 	tokens, err := prx.Lex(str)
 	if err != nil {
 		return nil, fmt.Errorf("invalid template: %w", err)

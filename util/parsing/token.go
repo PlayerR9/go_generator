@@ -18,6 +18,12 @@ type TokenTyper interface {
 	//   - bool: True if the token is an accept symbol. False otherwise.
 	IsAcceptSymbol() bool
 
+	// IsTerminal returns true if the token is a terminal.
+	//
+	// Returns:
+	//   - bool: True if the token is a terminal. False otherwise.
+	IsTerminal() bool
+
 	fmt.Stringer
 }
 

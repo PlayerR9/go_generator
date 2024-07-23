@@ -8,18 +8,18 @@ import (
 	utpx "github.com/PlayerR9/go_generator/util/parsing"
 )
 
+const (
+	// DebugMode is the debug mode. Default is true.
+	DebugMode bool = true
+)
+
 var (
 	// Logger is the logger. Never nil.
 	Logger *log.Logger
-
-	// DebugMode is the debug mode. Default is false.
-	DebugMode bool
 )
 
 func init() {
 	Logger = log.New(os.Stdout, "[parsing]: ", log.Lshortfile)
-
-	DebugMode = false
 }
 
 // Source = Elem { Elem } EOF .

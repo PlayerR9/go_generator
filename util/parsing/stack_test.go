@@ -15,6 +15,10 @@ func (t TestTokenType) IsAcceptSymbol() bool {
 	return false
 }
 
+func (t TestTokenType) IsTerminal() bool {
+	return false
+}
+
 func (t TestTokenType) String() string {
 	return [...]string{
 		"Elem",

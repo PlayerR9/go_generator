@@ -52,6 +52,11 @@ func (t TokenType) IsAcceptSymbol() bool {
 	return t == TkEOF
 }
 
+// IsTerminal implements the parsing.TokenTyper interface.
+func (t TokenType) IsTerminal() bool {
+	return t.IsAcceptSymbol()
+}
+
 // String implements the parsing.TokenTyper interface.
 func (t TokenType) String() string {
 	return [...]string{

@@ -419,7 +419,13 @@ func Parse(tokens []*utpx.Token[TokenType]) (*utpx.Token[TokenType], error) {
 			break
 		}
 
-		act, err := DecisionTable.Decide(p.stack, &top.Lookahead.Type)
+		var la *TokenType
+
+		if top.Lookahead != nil {
+			la = &top.Lookahead.Type
+		}
+
+		act, err := DecisionTable.Decide(p.stack, la)
 		p.stack.RefuseMany()
 		if err != nil {
 			if DebugMode {

@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	uc "github.com/PlayerR9/MyGoLib/Units/common"
+	utstr "github.com/PlayerR9/go_generator/util/strings"
 )
 
 // StringToTypeFunc is a function that transforms a string into a token type.
@@ -42,6 +43,24 @@ func (r *Rule[T]) String() string {
 	builder.WriteString(" .")
 
 	return builder.String()
+}
+
+// Iterator implements the uc.Iterable interface.
+//
+// Never returns nil
+func (r *Rule[T]) Iterator() uc.Iterater[T] {
+	return uc.NewSimpleIterator(r.rhss)
+}
+
+// Copy implements the uc.Copier interface.
+func (r *Rule[T]) Copy() uc.Copier {
+	rhss_copy := make([]T, len(r.rhss))
+	copy(rhss_copy, r.rhss)
+
+	return &Rule[T]{
+		lhs:  r.lhs,
+		rhss: rhss_copy,
+	}
 }
 
 // NewRule creates a new rule.
@@ -87,16 +106,93 @@ func (r *Rule[T]) GetLhs() T {
 	return r.lhs
 }
 
+// GetIndicesOfRhs returns the indices of the right hand side.
+//
+// Parameters:
+//   - rhs: The right hand side to search.
+//
+// Returns:
+//   - []int: The indices of the right hand side.
+func (r *Rule[T]) GetIndicesOfRhs(rhs T) []int {
+	var indices []int
+
+	for i := 0; i < len(r.rhss); i++ {
+		if r.rhss[i] == rhs {
+			indices = append(indices, i)
+		}
+	}
+
+	return indices
+}
+
+// GetRhsFromStart returns the right hand side from the start.
+//
+// Parameters:
+//   - start: The start index.
+//
+// Returns:
+//   - T: The right hand side.
+//   - bool: True if the start is valid. False otherwise.
+func (r *Rule[T]) GetRhsFromStart(start int) (T, bool) {
+	if start < 0 || start >= len(r.rhss) {
+		return *new(T), false
+	}
+
+	return r.rhss[len(r.rhss)-start-1], true
+}
+
 // Item is an item in the rule.
 type Item[T TokenTyper] struct {
-	// rule is the rule.
+	// rule is the rule. This contains a "copied" version of the rule. This can be modified.
 	rule *Rule[T]
 
-	// action is the action.
+	// action is the action. This contains the original rule. Do not modify it.
 	action Actioner[T]
 
 	// pos is the position in the rule.
 	pos int
+}
+
+// String implements the fmt.Stringer interface.
+func (item *Item[T]) String() string {
+	uc.Assert(item.rule != nil, "item.rule must not be nil")
+
+	var values []string
+
+	// rule : ( action )
+	iter := item.rule.Iterator()
+	var i int
+
+	for {
+		rhs, err := iter.Consume()
+		if err != nil {
+			break
+		}
+
+		rhs_str := utstr.ConnectWords(rhs.String())
+
+		if i == item.pos {
+			values = append(values, "[")
+			values = append(values, rhs_str)
+			values = append(values, "]")
+		} else {
+			values = append(values, rhs_str)
+		}
+
+		i++
+	}
+
+	var act_str string
+
+	if item.action != nil {
+		act_str = item.action.String()
+	} else {
+		act_str = "no action"
+	}
+
+	values = append(values, "->", utstr.ConnectWords(item.GetLhs().String()), ":", "(", act_str, ")", ".")
+
+	return strings.Join(values, " ")
 }
 
 // NewItem creates a new item.
@@ -131,8 +227,11 @@ func NewItem[T TokenTyper](rule *Rule[T], pos int, act Actioner[T]) (*Item[T], e
 		}
 	}
 
+	r_copy, ok := rule.Copy().(*Rule[T])
+	uc.AssertOk(ok, "rule.Copy() does not return a *Rule[T]")
+
 	return &Item[T]{
-		rule:   rule,
+		rule:   r_copy,
 		pos:    pos,
 		action: act,
 	}, nil
@@ -207,4 +306,18 @@ func (item *Item[T]) IsDone(delta int) bool {
 	pos := item.pos + delta
 
 	return pos >= len(item.rule.rhss)
+}
+
+// GetRhsFromStart returns the right hand side from the start.
+//
+// Parameters:
+//   - start: The start.
+//
+// Returns:
+//   - T: The right hand side.
+//   - bool: True if the index is valid. False otherwise.
+func (item *Item[T]) GetRhsFromStart(start int) (T, bool) {
+	uc.Assert(item.rule != nil, "item.rule must not be nil")
+
+	return item.rule.GetRhsFromStart(start)
 }

@@ -13,6 +13,11 @@ import (
 	uc "github.com/PlayerR9/MyGoLib/Units/common"
 )
 
+const (
+	// DebugMode is the debug mode. Default is true.
+	DebugMode bool = true
+)
+
 var (
 	// GoReservedKeywords is a list of Go reserved keywords.
 	GoReservedKeywords []string
