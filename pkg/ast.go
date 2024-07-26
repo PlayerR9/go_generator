@@ -6,11 +6,11 @@ import (
 	"slices"
 	"strings"
 
+	fstr "github.com/PlayerR9/MyGoLib/Formatting/Strings"
 	uc "github.com/PlayerR9/MyGoLib/Units/common"
 	us "github.com/PlayerR9/MyGoLib/Units/slice"
 	prx "github.com/PlayerR9/go_generator/pkg/parsing"
 	utpx "github.com/PlayerR9/go_generator/util/parsing"
-	uttr "github.com/PlayerR9/go_generator/util/tree"
 )
 
 // NodeType is the type of a token.
@@ -81,11 +81,11 @@ func (n *Node) IsLeaf() bool {
 // Iterator implements the tree.Noder interface.
 //
 // Never returns nil
-func (n *Node) Iterator() uc.Iterater[uttr.Noder] {
-	var children []uttr.Noder
+func (n *Node) Iterator() uc.Iterater[fstr.Noder] {
+	var children []fstr.Noder
 
 	if len(n.Children) != 0 {
-		children = make([]uttr.Noder, 0, len(n.Children))
+		children = make([]fstr.Noder, 0, len(n.Children))
 		for _, c := range n.Children {
 			children = append(children, c)
 		}
@@ -361,7 +361,7 @@ func PrintAST(node *Node) string {
 		return ""
 	}
 
-	str, err := uttr.PrintTree(node)
+	str, err := fstr.PrintTree(node)
 	uc.AssertErr(err, "tree.PrintTree(%s)", node.String())
 
 	return str

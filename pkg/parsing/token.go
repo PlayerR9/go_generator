@@ -81,3 +81,23 @@ func (t TokenType) String() string {
 		"Skippable whitespace",
 	}[t]
 }
+
+// GoString implements the parsing.TokenTyper interface.
+func (t TokenType) GoString() string {
+	return [...]string{
+		"TkEOF",
+		"TkDot",
+		"TkNewline",
+		"TkText",
+		"TkOpCurly",
+		"TkClCurly",
+		"TkVariableName",
+		"TkWs",
+
+		"TkSource",
+		"TkSource1",
+		"TkElem",
+		"TkVariable",
+		"TkSws",
+	}[t]
+}

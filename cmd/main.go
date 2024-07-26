@@ -4,7 +4,7 @@ import (
 	"log"
 	"text/template"
 
-	ggen "github.com/PlayerR9/go_generator/pkg"
+	ggen "github.com/PlayerR9/MyGoLib/Generator"
 )
 
 var (

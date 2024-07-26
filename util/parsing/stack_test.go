@@ -21,6 +21,12 @@ func (t TestTokenType) IsTerminal() bool {
 
 func (t TestTokenType) String() string {
 	return [...]string{
+		"element",
+	}[t]
+}
+
+func (t TestTokenType) GoString() string {
+	return [...]string{
 		"Elem",
 	}[t]
 }
@@ -42,7 +48,7 @@ func TestPeek(t *testing.T) {
 	if !ok {
 		t.Errorf("expected true, got false")
 	} else if tok.Type != Elem {
-		t.Errorf("expected Elem, got %s", tok.Type)
+		t.Errorf("expected Elem, got %s", tok.Type.GoString())
 	}
 }
 
@@ -62,21 +68,21 @@ func TestPush(t *testing.T) {
 	if !ok {
 		t.Errorf("expected true, got false")
 	} else if tok.Type != Elem || tok.Data != "3" {
-		t.Errorf("expected Elem, got %s", tok.Type)
+		t.Errorf("expected Elem, got %s", tok.Type.GoString())
 	}
 
 	tok, ok = stack.Pop()
 	if !ok {
 		t.Errorf("expected true, got false")
 	} else if tok.Type != Elem || tok.Data != "2" {
-		t.Errorf("expected Elem, got %s", tok.Type)
+		t.Errorf("expected Elem, got %s", tok.Type.GoString())
 	}
 
 	tok, ok = stack.Pop()
 	if !ok {
 		t.Errorf("expected true, got false")
 	} else if tok.Type != Elem || tok.Data != "1" {
-		t.Errorf("expected Elem, got %s", tok.Type)
+		t.Errorf("expected Elem, got %s", tok.Type.GoString())
 	}
 }
 
@@ -99,7 +105,7 @@ func TestRefuseOne(t *testing.T) {
 	if !ok {
 		t.Errorf("expected true, got false")
 	} else if res_tok.Type != Elem || res_tok.Data != "1" {
-		t.Errorf("expected Elem, got %s", res_tok.Type)
+		t.Errorf("expected Elem, got %s", res_tok.Type.GoString())
 	}
 
 	ok = stack.RefuseOne()
@@ -111,7 +117,7 @@ func TestRefuseOne(t *testing.T) {
 	if !ok {
 		t.Errorf("expected true, got false")
 	} else if res_tok.Type != Elem || res_tok.Data != "1" {
-		t.Errorf("expected Elem, got %s", res_tok.Type)
+		t.Errorf("expected Elem, got %s", res_tok.Type.GoString())
 	}
 }
 

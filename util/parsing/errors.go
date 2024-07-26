@@ -4,7 +4,7 @@ import (
 	"strconv"
 	"strings"
 
-	uc "github.com/PlayerR9/MyGoLib/Units/common"
+	utstr "github.com/PlayerR9/MyGoLib/Utility/strings"
 )
 
 // ErrExpected is an error for expected values.
@@ -49,7 +49,7 @@ func (e *ErrExpected[T]) Error() string {
 		values = append(values, strconv.Quote(v.String()))
 	}
 
-	builder.WriteString(uc.OrString(values, false))
+	builder.WriteString(utstr.OrString(values, false, false))
 	builder.WriteString(" before ")
 	builder.WriteString(before)
 	builder.WriteString(", got ")

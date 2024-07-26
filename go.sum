@@ -1,5 +1,9 @@
 github.com/PlayerR9/MyGoLib v0.4.3 h1:iCR+1TAITltb1pWR1BLyNLzArHrfo7xdyL7tDPjZjbI=
 github.com/PlayerR9/MyGoLib v0.4.3/go.mod h1:KosnXjviGS+DI9I5/NqQSZ8dFW+6vJkDgD5S9ER9sPo=
+github.com/PlayerR9/MyGoLib v0.4.4 h1:RLO95UAM9PM26r3DPzkTlut1o30qRvBtjDksmmxhJkM=
+github.com/PlayerR9/MyGoLib v0.4.4/go.mod h1:KosnXjviGS+DI9I5/NqQSZ8dFW+6vJkDgD5S9ER9sPo=
+github.com/PlayerR9/MyGoLib v0.4.5 h1:HSMoONxpSbqqJoOvE2pLrDNxghs8YrxF96u9UIHYD+A=
+github.com/PlayerR9/MyGoLib v0.4.5/go.mod h1:KosnXjviGS+DI9I5/NqQSZ8dFW+6vJkDgD5S9ER9sPo=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/kr/pretty v0.1.0/go.mod h1:dAy3ld7l9f0ibDNOQOHHMYYIIbhfbHSm3C4ZsoJORNo=

@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	uc "github.com/PlayerR9/MyGoLib/Units/common"
-	utstr "github.com/PlayerR9/go_generator/util/strings"
+	utstr "github.com/PlayerR9/MyGoLib/Utility/strings"
 )
 
 // StringToTypeFunc is a function that transforms a string into a token type.
@@ -173,14 +173,12 @@ func (item *Item[T]) String() string {
 			break
 		}
 
-		rhs_str := utstr.ConnectWords(rhs.String())
-
 		if i == item.pos {
 			values = append(values, "[")
-			values = append(values, rhs_str)
+			values = append(values, rhs.GoString())
 			values = append(values, "]")
 		} else {
-			values = append(values, rhs_str)
+			values = append(values, rhs.GoString())
 		}
 
 		i++
@@ -194,7 +192,7 @@ func (item *Item[T]) String() string {
 		act_str = "no action"
 	}
 
-	values = append(values, "->", utstr.ConnectWords(item.GetLhs().String()), ":", "(", act_str, ")", ".")
+	values = append(values, "->", item.GetLhs().GoString(), ":", "(", act_str, ")", ".")
 
 	return strings.Join(values, " ")
 }
@@ -268,10 +266,10 @@ func (item *Item[T]) MatchLookahead(la *T) (bool, error) {
 	values := make([]string, 0, len(item.lookaheads))
 
 	for _, lookahead := range item.lookaheads {
-		values = append(values, lookahead.String())
+		values = append(values, lookahead.GoString())
 	}
 
-	return false, fmt.Errorf("expected %s, got %q instead", uc.OrQuoteString(values, false), *la)
+	return false, fmt.Errorf("expected %s, got %q instead", utstr.OrString(values, true, false), *la)
 }
 
 // GetLhs returns the left hand side.

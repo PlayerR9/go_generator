@@ -12,6 +12,15 @@ import (
 	utpx "github.com/PlayerR9/go_generator/util/parsing"
 )
 
+var (
+	// DebugMode is the debug mode.
+	DebugMode bool
+)
+
+func init() {
+	DebugMode = true
+}
+
 // Template is a template.
 type Template struct {
 	// root is the root node of the AST.

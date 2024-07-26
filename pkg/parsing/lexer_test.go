@@ -15,39 +15,39 @@ func TestLexer(t *testing.T) {
 	}
 
 	if tokens[0].Type != TkOpCurly {
-		t.Errorf("expected open curly, got %s", tokens[0].Type)
+		t.Errorf("expected open curly, got %s", tokens[0].Type.GoString())
 	}
 
 	if tokens[1].Type != TkDot {
-		t.Errorf("expected dot, got %s", tokens[1].Type)
+		t.Errorf("expected dot, got %s", tokens[1].Type.GoString())
 	}
 
 	if tokens[2].Type != TkVariableName {
-		t.Errorf("expected variable name, got %s", tokens[2].Type)
+		t.Errorf("expected variable name, got %s", tokens[2].Type.GoString())
 	}
 
 	if tokens[3].Type != TkClCurly {
-		t.Errorf("expected close curly, got %s", tokens[3].Type)
+		t.Errorf("expected close curly, got %s", tokens[3].Type.GoString())
 	}
 
 	if tokens[4].Type != TkOpCurly {
-		t.Errorf("expected open curly, got %s", tokens[4].Type)
+		t.Errorf("expected open curly, got %s", tokens[4].Type.GoString())
 	}
 
 	if tokens[5].Type != TkDot {
-		t.Errorf("expected dot, got %s", tokens[5].Type)
+		t.Errorf("expected dot, got %s", tokens[5].Type.GoString())
 	}
 
 	if tokens[6].Type != TkVariableName {
-		t.Errorf("expected variable name, got %s", tokens[6].Type)
+		t.Errorf("expected variable name, got %s", tokens[6].Type.GoString())
 	}
 
 	if tokens[7].Type != TkClCurly {
-		t.Errorf("expected close curly, got %s", tokens[7].Type)
+		t.Errorf("expected close curly, got %s", tokens[7].Type.GoString())
 	}
 
 	if tokens[8].Type != TkText {
-		t.Errorf("expected text, got %s", tokens[8].Type)
+		t.Errorf("expected text, got %s", tokens[8].Type.GoString())
 	}
 
 	if tokens[8].Data != "my_test" {
@@ -55,6 +55,6 @@ func TestLexer(t *testing.T) {
 	}
 
 	if tokens[9].Type != TkEOF {
-		t.Errorf("expected end of file, got %s", tokens[9].Type)
+		t.Errorf("expected end of file, got %s", tokens[9].Type.GoString())
 	}
 }

@@ -6,9 +6,9 @@ import (
 	"slices"
 	"strings"
 
+	cdmaps "github.com/PlayerR9/MyGoLib/CustomData/maps"
 	uc "github.com/PlayerR9/MyGoLib/Units/common"
 	us "github.com/PlayerR9/MyGoLib/Units/slice"
-	utmp "github.com/PlayerR9/go_generator/util/maps"
 	utr "github.com/PlayerR9/go_generator/util/rank"
 )
 
@@ -398,7 +398,7 @@ func (dt *DecisionTable[T]) solve_conflicts() {
 	}
 
 	for item, prev := range target_items {
-		seen := utmp.NewSeenMap[*Item[T]]()
+		seen := cdmaps.NewSeenMap[*Item[T]]()
 
 		las := dt.solve_lookaheads(seen, prev)
 
@@ -427,8 +427,8 @@ func (dt *DecisionTable[T]) solve_conflicts() {
 	}
 }
 
-func (dt *DecisionTable[T]) solve_lookaheads(seen *utmp.SeenMap[*Item[T]], target T) []T {
-	uc.AssertParam("seen", seen != nil, errors.New("value must not be nil"))
+func (dt *DecisionTable[T]) solve_lookaheads(seen *cdmaps.SeenMap[*Item[T]], target T) []T {
+	uc.AssertNil(seen, "seen")
 
 	// 1. Find all rules whose LHS is the same as the 'target'.
 	other_items := dt.GetItemsByLhs(target)

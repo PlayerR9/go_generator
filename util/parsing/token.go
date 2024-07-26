@@ -5,8 +5,8 @@ import (
 	"strconv"
 	"strings"
 
+	fstr "github.com/PlayerR9/MyGoLib/Formatting/Strings"
 	uc "github.com/PlayerR9/MyGoLib/Units/common"
-	uttr "github.com/PlayerR9/go_generator/util/tree"
 )
 
 type TokenTyper interface {
@@ -24,6 +24,7 @@ type TokenTyper interface {
 	//   - bool: True if the token is a terminal. False otherwise.
 	IsTerminal() bool
 
+	fmt.GoStringer
 	fmt.Stringer
 }
 
@@ -37,7 +38,7 @@ func (t *Token[T]) GoString() string {
 	var builder strings.Builder
 
 	builder.WriteString("Token[Type=")
-	builder.WriteString(t.Type.String())
+	builder.WriteString(t.Type.GoString())
 	builder.WriteString(", Data=")
 
 	switch data := t.Data.(type) {
@@ -76,13 +77,13 @@ func (t *Token[T]) String() string {
 	switch data := t.Data.(type) {
 	case string:
 		builder.WriteString("Token[")
-		builder.WriteString(t.Type.String())
+		builder.WriteString(t.Type.GoString())
 		builder.WriteString("(")
 		builder.WriteString(strconv.Quote(data))
 		builder.WriteString(")]")
 	case []*Token[T]:
 		builder.WriteString("Token[")
-		builder.WriteString(t.Type.String())
+		builder.WriteString(t.Type.GoString())
 		builder.WriteString("]")
 	default:
 		builder.WriteString("unknown")
@@ -114,13 +115,13 @@ func (t *Token[T]) IsLeaf() bool {
 	return ok
 }
 
-func (t *Token[T]) Iterator() uc.Iterater[uttr.Noder] {
+func (t *Token[T]) Iterator() uc.Iterater[fstr.Noder] {
 	children, ok := t.Data.([]*Token[T])
 	if !ok {
 		return nil
 	}
 
-	elems := make([]uttr.Noder, 0, len(children))
+	elems := make([]fstr.Noder, 0, len(children))
 
 	for _, child := range children {
 		elems = append(elems, child)

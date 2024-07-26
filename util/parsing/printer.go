@@ -1,8 +1,8 @@
 package parsing
 
 import (
+	fstr "github.com/PlayerR9/MyGoLib/Formatting/Strings"
 	uc "github.com/PlayerR9/MyGoLib/Units/common"
-	uttr "github.com/PlayerR9/go_generator/util/tree"
 )
 
 func PrintTokenTree[T TokenTyper](root *Token[T]) string {
@@ -10,7 +10,7 @@ func PrintTokenTree[T TokenTyper](root *Token[T]) string {
 		return ""
 	}
 
-	str, err := uttr.PrintTree(root)
+	str, err := fstr.PrintTree(root)
 	uc.AssertErr(err, "tree.PrintTree(%s)", root.GoString())
 
 	return str
