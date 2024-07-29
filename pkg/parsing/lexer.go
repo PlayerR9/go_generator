@@ -7,8 +7,8 @@ import (
 	"unicode"
 	"unicode/utf8"
 
-	uc "github.com/PlayerR9/MyGoLib/Units/common"
 	utpx "github.com/PlayerR9/go_generator/util/parsing"
+	uc "github.com/PlayerR9/lib_units/common"
 )
 
 // Lexer is a lexical analyzer for the template.

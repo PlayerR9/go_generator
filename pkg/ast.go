@@ -7,10 +7,10 @@ import (
 	"strings"
 
 	fstr "github.com/PlayerR9/MyGoLib/Formatting/Strings"
-	uc "github.com/PlayerR9/MyGoLib/Units/common"
-	us "github.com/PlayerR9/MyGoLib/Units/slice"
 	prx "github.com/PlayerR9/go_generator/pkg/parsing"
 	utpx "github.com/PlayerR9/go_generator/util/parsing"
+	uc "github.com/PlayerR9/lib_units/common"
+	us "github.com/PlayerR9/lib_units/slices"
 )
 
 // NodeType is the type of a token.

@@ -2,7 +2,7 @@ package parsing
 
 import (
 	fstr "github.com/PlayerR9/MyGoLib/Formatting/Strings"
-	uc "github.com/PlayerR9/MyGoLib/Units/common"
+	uc "github.com/PlayerR9/lib_units/common"
 )
 
 func PrintTokenTree[T TokenTyper](root *Token[T]) string {

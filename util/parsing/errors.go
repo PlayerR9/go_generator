@@ -4,7 +4,7 @@ import (
 	"strconv"
 	"strings"
 
-	utstr "github.com/PlayerR9/MyGoLib/Utility/strings"
+	utstr "github.com/PlayerR9/lib_units/strings"
 )
 
 // ErrExpected is an error for expected values.

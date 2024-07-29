@@ -5,8 +5,8 @@ import (
 	"slices"
 	"strings"
 
-	uc "github.com/PlayerR9/MyGoLib/Units/common"
-	utstr "github.com/PlayerR9/MyGoLib/Utility/strings"
+	uc "github.com/PlayerR9/lib_units/common"
+	utstr "github.com/PlayerR9/lib_units/strings"
 )
 
 // StringToTypeFunc is a function that transforms a string into a token type.
